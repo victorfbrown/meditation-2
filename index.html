@@ -1,0 +1,87 @@
+<link rel="stylesheet" href="https://generativeart.online/css/drawing-app.css">
+<script src="https://cdn.jsdelivr.net/gh/netizenorg/netnet-standard-library/build/nn.min.js"></script>
+<script>
+/* global nn */
+
+  
+function sleep (ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+  
+
+let maxUnsproutedCenters = 2
+let unsproutedCenters = 0
+const minPetals = 7
+const maxPetals = 25
+  
+const surroundingEmojis = ['🔴','🔵','🟡']
+  
+async function sproutFlower(emoji) {
+  const left = emoji.left
+  const top = emoji.top
+  const fontSize = Number(emoji.style.fontSize.slice(0,-2))
+  console.log(fontSize)
+  const numPetals = Math.round(minPetals + Math.random() * (maxPetals-minPetals))
+  const fullCircle = 2 * Math.PI
+  const startingAngle = Math.random() * fullCircle
+  console.log(emoji)
+  const surroundingEmoji = nn.random(surroundingEmojis)
+  for (let i = 0; i<numPetals; i++) {
+    const currAngle = startingAngle + (i * fullCircle / numPetals)
+    
+    const vertDist = Math.sin(currAngle) * fontSize
+    const horizDist = Math.cos(currAngle) * fontSize
+    
+    const newTop = top + vertDist
+    const newLeft = left + horizDist
+    
+    const emoji = nn.create('span')
+    .content(surroundingEmoji)
+    .css({
+      position: 'absolute',
+      fontSize: fontSize,
+      cursor: 'pointer',
+      left: newLeft,
+      top: newTop
+    })
+    .addTo('body')
+    .on('click', () => emoji.remove())
+  }
+  await sleep(1000)
+  if (centerEmoji.includes(emoji.innerHTML)) {
+      unsproutedCenters--
+  }
+  unsproutedCenters = Math.max(0, unsproutedCenters)
+}
+
+const centerEmoji = [
+    '⚫️', '🟤'
+  ]
+  
+
+function createEmoji () {
+  setTimeout(createEmoji, 1000)
+  
+  if (unsproutedCenters >= maxUnsproutedCenters) {
+    return
+  }
+  unsproutedCenters++
+  
+
+  const emoji = nn.create('span')
+    .content(nn.random(centerEmoji))
+    .css({
+      position: 'absolute',
+      fontSize: nn.random(20, 100),
+      cursor: 'pointer',
+      left: nn.random(0, nn.width-100),
+      top: nn.random(0, nn.height-100)
+    })
+    .addTo('body')
+    .on('click', () => sproutFlower(emoji))
+}
+  
+nn.on('load', createEmoji)
+console.log()
+
+</script>
